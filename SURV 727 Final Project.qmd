@@ -1,0 +1,47 @@
+---
+title: "SURV 727 Final Project"
+format: html
+editor: visual
+---
+
+```{r}
+library(ravelRy)
+library(tidyverse)
+
+username <- 'read-3d3976da5ec4d757981a45b11574ad39'
+password <- 'grU3puOBHF1Si3+tLWe2gaw/bX1xzuTRqRH/+f+w'
+
+ravelry_auth(key = 'password') 
+
+hot_11_25 <- search_patterns(permalink = 'sailor-slippers', page_size = 20)
+
+pattern_details_11_25 <- get_patterns(ids = hot_11_25$id)
+
+pattern_details_11_25 <- pattern_details_11_25 %>%
+  mutate(pull_date = "11/25/25")
+```
+
+```{r}
+pattern_details_11_16 <- unnest(pattern_details_11_16, cols = pattern_needle_sizes, names_sep = "needles")
+
+pattern_details_11_16 <- unnest(pattern_details_11_16, cols = languages, names_sep = "languages")
+
+pattern_details_11_16 <- unnest(pattern_details_11_16, cols = craft, names_sep = "craft")
+
+pattern_details_11_16 <- unnest(pattern_details_11_16, cols = pattern_categories, names_sep = "category")
+
+pattern_details_11_16_clean <- pattern_details_11_16 %>%
+  select(difficulty_average, favorites_count, free, name, rating_average, yarn_weight_description, pattern_needle_sizesneedlesus, pattern_needle_sizesneedlescrochet, pattern_needle_sizesneedlesknitting, pattern_needle_sizesneedleshook, languageslanguagesname, craftcraftname, pattern_categoriescategoryname, pattern_categoriescategoryparent.name, pattern_categoriescategoryparent.parent.name, pull_date) %>%
+  group_by(name) %>%
+  mutate(n_langs = n()) %>%
+  distinct(name, .keep_all = TRUE) %>%
+  rename(knit_needle_size = pattern_needle_sizesneedlesus,
+         crochet_hook = pattern_needle_sizesneedlescrochet,
+         knit_needles = pattern_needle_sizesneedlesknitting,
+         crochet_hook_size = pattern_needle_sizesneedleshook,
+         craft = craftcraftname,
+         pattern_cat = pattern_categoriescategoryname,
+         pattern_parent_cat = pattern_categoriescategoryparent.name,
+         pattern_parent_parent_cat = pattern_categoriescategoryparent.parent.name) %>%
+  select(-(languageslanguagesname))
+```
