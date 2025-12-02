@@ -8,6 +8,8 @@ editor: visual
 # pull data code
 library(ravelRy)
 library(tidyverse)
+library(shiny)
+library(scales)
 
 username <- 'read-3d3976da5ec4d757981a45b11574ad39'
 password <- 'grU3puOBHF1Si3+tLWe2gaw/bX1xzuTRqRH/+f+w'
@@ -160,5 +162,203 @@ all_patts_clean <- all_patts %>%
   group_by(name) %>%
   mutate(appearance_count = n()) %>%
   arrange(desc(pull_day)) %>%
-  distinct(name, .keep_all = TRUE)
+  distinct(name, .keep_all = TRUE) %>%
+  mutate(knit_needle_size = ifelse(knit_needle_size == "6.0", "6", knit_needle_size))
+
+# change variable names for Shiny app
+all_patts_clean <- all_patts_clean %>%
+  rename(`Number of Top 20 Appearances` = appearance_count,
+         Craft = craft,
+         `Average Difficulty Rating` = difficulty_average,
+         `Number of Favorites` = favorites_count,
+         Free = free,
+         `Knitting Needle Size` = knit_needle_size,
+         `Number of Languages` = n_langs,
+         `Pattern Category` = pattern_cat,
+         `Pattern Parent Category` = pattern_parent_cat,
+         `Pattern Grandparent Category` = pattern_parent_parent_cat,
+         `Average Rating` = rating_average,
+         `Yarn Weight` = yarn_weight_description) %>%
+  mutate(Free = ifelse(Free == FALSE, "Free", "Paid"),
+         `Knitting Needle Size` = recode(`Knitting Needle Size`,
+                                         "1 " = "1",
+                                         "10 " = "10",
+                                         "10½" = "10.5",
+                                         "11 " = "11",
+                                         "1½" = "1.5",
+                                         "2 " = "2",
+                                         "2½" = "2.5",
+                                         "3 " = "3",
+                                         "4 " = "4",
+                                         "5 " = "5",
+                                         "6 " = "6",
+                                         "7 " = "7",
+                                         "8 " = "8",
+                                         "9 " = "9"),
+         `Knitting Needle Size` = as.numeric(`Knitting Needle Size`))
+
+all_patts_clean$`Knitting Needle Size` <- as.factor(all_patts_clean$`Knitting Needle Size`)
+
+# shiny does not like spaces, so rename variables
+all_patts_shiny <- all_patts_clean %>%
+  rename(Number_of_Top_20_Appearances = `Number of Top 20 Appearances`,
+         Average_Difficulty_Rating = `Average Difficulty Rating`,
+         Number_of_Favorites = `Number of Favorites`,
+         Knitting_Needle_Size = `Knitting Needle Size`,
+         Number_of_Languages = `Number of Languages`,
+         Pattern_Category = `Pattern Category`,
+         Pattern_Parent_Category = `Pattern Parent Category`,
+         Pattern_Grandparent_Category = `Pattern Grandparent Category`,
+         Average_Rating = `Average Rating`,
+         Yarn_Weight = `Yarn Weight`) %>%
+  mutate(Average_Difficulty_Rating = round(Average_Difficulty_Rating, 1),
+         Average_Rating = round(Average_Rating, 1),
+         Free = ifelse(Free == "Free", "P", "Free"),
+         Free = ifelse(Free == "P", "Paid", Free))
+```
+
+```{r}
+# statistical analysis of independent variables vs favorites count
+# difficulty average
+cor.test(all_patts_clean$`Number of Favorites`, all_patts_clean$`Average Difficulty Rating`)
+lm1 <- lm(all_patts_clean$`Number of Favorites` ~ all_patts_clean$`Average Difficulty Rating`)
+summary(lm1)
+
+# free
+lm2 <- lm(all_patts_clean$`Number of Favorites` ~ all_patts_clean$Free)
+summary(lm2)
+
+# rating average
+cor.test(all_patts_clean$`Number of Favorites`, all_patts_clean$`Average Rating`)
+lm3 <- lm(all_patts_clean$`Number of Favorites` ~ all_patts_clean$`Average Rating`)
+summary(lm3)
+
+# yarn weight description
+lm4 <- lm(all_patts_clean$`Number of Favorites` ~ all_patts_clean$`Yarn Weight`)
+summary(lm4)
+
+# knitting needle size
+lm5 <- lm(all_patts_clean$`Number of Favorites` ~ all_patts_clean$`Knitting Needle Size`)
+summary(lm5)
+
+# craft
+lm6 <- lm(all_patts_clean$`Number of Favorites` ~ all_patts_clean$Craft)
+summary(lm6)
+
+# pattern category
+lm7 <- lm(all_patts_clean$`Number of Favorites` ~ all_patts_clean$`Pattern Category`)
+summary(lm7)
+
+# pattern parent category
+lm8 <- lm(all_patts_clean$`Number of Favorites` ~ all_patts_clean$`Pattern Parent Category`)
+summary(lm8)
+
+# pattern grandparent category
+lm9 <- lm(all_patts_clean$`Number of Favorites` ~ all_patts_clean$`Pattern Grandparent Category`)
+summary(lm9)
+
+# number of langs
+cor.test(all_patts_clean$`Number of Favorites`, all_patts_clean$`Number of Languages`)
+lm10 <- lm(all_patts_clean$`Number of Favorites` ~ all_patts_clean$`Number of Languages`)
+summary(lm10)
+```
+
+```{r}
+# statistical analysis of independent variables vs appearance count
+# difficulty average
+cor.test(all_patts_clean$`Number of Top 20 Appearances`, all_patts_clean$`Average Difficulty Rating`)
+lm1 <- lm(all_patts_clean$`Number of Top 20 Appearances` ~ all_patts_clean$`Average Difficulty Rating`)
+summary(lm1)
+
+# free
+lm2 <- lm(all_patts_clean$`Number of Top 20 Appearances` ~ all_patts_clean$Free)
+summary(lm2)
+
+# rating average
+cor.test(all_patts_clean$`Number of Top 20 Appearances`, all_patts_clean$`Average Rating`)
+lm3 <- lm(all_patts_clean$`Number of Top 20 Appearances` ~ all_patts_clean$`Average Rating`)
+summary(lm3)
+
+# yarn weight description
+lm4 <- lm(all_patts_clean$`Number of Top 20 Appearances` ~ all_patts_clean$`Yarn Weight`)
+summary(lm4)
+
+# knitting needle size
+lm5 <- lm(all_patts_clean$`Number of Top 20 Appearances` ~ all_patts_clean$`Knitting Needle Size`)
+summary(lm5)
+
+# craft
+lm6 <- lm(all_patts_clean$`Number of Top 20 Appearances` ~ all_patts_clean$Craft)
+summary(lm6)
+
+# pattern category
+lm7 <- lm(all_patts_clean$`Number of Top 20 Appearances` ~ all_patts_clean$`Pattern Category`)
+summary(lm7)
+
+# pattern parent category
+lm8 <- lm(all_patts_clean$`Number of Top 20 Appearances` ~ all_patts_clean$`Pattern Parent Category`)
+summary(lm8)
+
+# pattern grandparent category
+lm9 <- lm(all_patts_clean$`Number of Top 20 Appearances` ~ all_patts_clean$`Pattern Grandparent Category`)
+summary(lm9)
+
+# number of langs
+cor.test(all_patts_clean$`Number of Top 20 Appearances`, all_patts_clean$`Number of Languages`)
+lm10 <- lm(all_patts_clean$`Number of Top 20 Appearances` ~ all_patts_clean$`Number of Languages`)
+summary(lm10)
+```
+
+```{r}
+theme_set(theme_bw())
+
+ui <- fluidPage(
+  selectInput("x_var", "Choose X-axis variable:", 
+              choices = c("Average_Difficulty_Rating", 
+                          "Average_Rating", 
+                          "Craft", "Free", 
+                          "Knitting_Needle_Size", 
+                          "Number_of_Languages", 
+                          "Pattern_Category", 
+                          "Pattern_Parent_Category", 
+                          "Pattern_Grandparent_Category", 
+                          "Yarn_Weight")),
+  selectInput("y_var", "Choose Y-axis variable:", 
+              choices = c("Number_of_Favorites", 
+                          "Number_of_Top_20_Appearances")),
+  plotOutput("my_bar_plot")
+)
+
+server <- function(input, output) {
+  output$my_bar_plot <- renderPlot({
+    # Assuming 'data' is your dataset
+    ggplot(all_patts_shiny, aes_string(x = input$x_var, y = input$y_var)) +
+      geom_bar(stat = ifelse(input$y_var == "count", "count", "identity"),
+               fill = "dodgerblue2") +
+      scale_y_continuous(labels = label_comma()) +
+      labs(title = paste("Bar Chart of", input$y_var, "by", input$x_var),
+           x = input$x_var,
+           y = input$y_var) +
+      theme(axis.title.x = element_text(vjust = 0, 
+                                        size = 15, 
+                                        colour = "grey0", 
+                                        face = "bold"),
+            axis.title.y = element_text(vjust = 2, 
+                                        size = 15, 
+                                        colour = "grey0", 
+                                        face = "bold"),
+            plot.title = element_text(size = 18, 
+                                      colour = "grey0", 
+                                      face = "bold", 
+                                      hjust = 0.5, 
+                                      margin = margin(10, 0, 10, 0)),
+            axis.text = element_text(colour = "grey0", 
+                                     size = 12),
+            axis.text.x = element_text(angle = 50,
+                                       vjust = 0.5,
+                                       hjust = 0.5))
+  })
+}
+
+shinyApp(ui, server)
 ```
