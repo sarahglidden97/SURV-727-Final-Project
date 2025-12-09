@@ -3,6 +3,11 @@ title: "SURV 727 Final Project"
 format: html
 editor: visual
 ---
+# Ravelry Popularity Exploration Code
+
+## GitHub link: https://github.com/sarahglidden97/SURV-727-Final-Project
+
+## Load packages and data pull code
 
 ```{r}
 # pull data code
@@ -11,149 +16,161 @@ library(tidyverse)
 library(shiny)
 library(scales)
 library(rsconnect)
-
-#username <- 'read-3d3976da5ec4d757981a45b11574ad39'
-#password <- 'grU3puOBHF1Si3+tLWe2gaw/bX1xzuTRqRH/+f+w'
-
-#ravelry_auth(key = 'password') 
-
-#hot_11_25 <- search_patterns(permalink = 'sailor-slippers', page_size = 20)
-
-#pattern_details_11_25 <- get_patterns(ids = hot_11_25$id)
-
-#pattern_details_11_25 <- pattern_details_11_25 %>%
-  #mutate(pull_date = "11/25/25")
 ```
 
-```{r}
-# cleaning data code
-# test with 11/16/2025 data set
-# pattern_details_11_16 <- unnest(pattern_details_11_16, cols = pattern_needle_sizes, names_sep = "needles")
-# 
-# pattern_details_11_16 <- unnest(pattern_details_11_16, cols = languages, names_sep = "languages")
-# 
-# pattern_details_11_16 <- unnest(pattern_details_11_16, cols = craft, names_sep = "craft")
-# 
-# pattern_details_11_16 <- unnest(pattern_details_11_16, cols = pattern_categories, names_sep = "category")
-# 
-# pattern_details_11_16_clean <- pattern_details_11_16 %>%
-#   select(difficulty_average, favorites_count, free, name, rating_average, yarn_weight_description, pattern_needle_sizesneedlesus, pattern_needle_sizesneedlescrochet, pattern_needle_sizesneedlesknitting, pattern_needle_sizesneedleshook, languageslanguagesname, craftcraftname, pattern_categoriescategoryname, pattern_categoriescategoryparent.name, pattern_categoriescategoryparent.parent.name, pull_date) %>%
-#   group_by(name) %>%
-#   mutate(n_langs = n()) %>%
-#   distinct(name, .keep_all = TRUE) %>%
-#   rename(knit_needle_size = pattern_needle_sizesneedlesus,
-#          crochet_hook = pattern_needle_sizesneedlescrochet,
-#          knit_needles = pattern_needle_sizesneedlesknitting,
-#          crochet_hook_size = pattern_needle_sizesneedleshook,
-#          craft = craftcraftname,
-#          pattern_cat = pattern_categoriescategoryname,
-#          pattern_parent_cat = pattern_categoriescategoryparent.name,
-#          pattern_parent_parent_cat = pattern_categoriescategoryparent.parent.name) %>%
-#   select(-(languageslanguagesname))
-# 
-# # write function to clean remaining data sets
-# clean_func <- function(i) {
-#   i <- unnest(i, cols = pattern_needle_sizes, names_sep = "needles")
-#   
-#   i <- unnest(i, cols = languages, names_sep = "languages")
-#   
-#   i <- unnest(i, cols = craft, names_sep = "craft")
-#   
-#   i <- unnest(i, cols = pattern_categories, names_sep = "category")
-#   
-#   i <- i %>%
-#     select(difficulty_average, 
-#            favorites_count, 
-#            free, 
-#            name, 
-#            rating_average, 
-#            yarn_weight_description, 
-#            pattern_needle_sizesneedlesus, 
-#            pattern_needle_sizesneedlescrochet, 
-#            pattern_needle_sizesneedlesknitting, 
-#            pattern_needle_sizesneedleshook, 
-#            languageslanguagesname, 
-#            craftcraftname, 
-#            pattern_categoriescategoryname, 
-#            pattern_categoriescategoryparent.name, 
-#            pattern_categoriescategoryparent.parent.name, 
-#            pull_date) %>%
-#     group_by(name) %>%
-#     mutate(n_langs = n()) %>%
-#     distinct(name, .keep_all = TRUE) %>%
-#     rename(knit_needle_size = pattern_needle_sizesneedlesus,
-#            crochet_hook = pattern_needle_sizesneedlescrochet,
-#            knit_needles = pattern_needle_sizesneedlesknitting,
-#            crochet_hook_size = pattern_needle_sizesneedleshook,
-#            craft = craftcraftname,
-#            pattern_cat = pattern_categoriescategoryname,
-#            pattern_parent_cat = pattern_categoriescategoryparent.name,
-#            pattern_parent_parent_cat = pattern_categoriescategoryparent.parent.name) %>%
-#     select(-(languageslanguagesname))
-# }
-# 
-# # create list of data sets
-# patt_list <- list(pattern_details_11_17, 
-#                   pattern_details_11_18, 
-#                   pattern_details_11_19, 
-#                   pattern_details_11_20, 
-#                   pattern_details_11_21, 
-#                   pattern_details_11_23, 
-#                   pattern_details_11_24, 
-#                   pattern_details_11_25)
-# 
-# # run function on all data sets
-# patt_list_clean <- lapply(patt_list, clean_func)
-# 
-# # unlist data sets and bind all rows to create full data set
-# all_patts <- bind_rows(patt_list_clean)
-# 
-# # add the 11/16 data set
-# all_patts <- bind_rows(all_patts, pattern_details_11_16_clean)
-# 
-# # extract pattern from 11/18 that was not included, clean and add to dataset
-# missing_11_18 <- pattern_details_11_18 %>%
-#   filter(name == "Santas look socks")
-# 
-# missing_11_18 <- unnest(missing_11_18, cols = languages, names_sep = "languages")
-#   
-# missing_11_18 <- unnest(missing_11_18, cols = craft, names_sep = "craft")
-#   
-# missing_11_18 <- unnest(missing_11_18, cols = pattern_categories, names_sep = "category")
-# 
-# clean_11_18 <- missing_11_18 %>%
-#     select(difficulty_average, 
-#            favorites_count, 
-#            free, 
-#            name, 
-#            rating_average, 
-#            yarn_weight_description, 
-#            languageslanguagesname, 
-#            craftcraftname, 
-#            pattern_categoriescategoryname, 
-#            pattern_categoriescategoryparent.name, 
-#            pattern_categoriescategoryparent.parent.name, 
-#            pull_date) %>%
-#   mutate(pattern_needle_sizesneedlesus = NA,
-#          pattern_needle_sizesneedlescrochet = NA,
-#          pattern_needle_sizesneedlesknitting = NA,
-#          pattern_needle_sizesneedleshook = NA) %>%
-#   group_by(name) %>%
-#     mutate(n_langs = n()) %>%
-#     distinct(name, .keep_all = TRUE) %>%
-#     rename(knit_needle_size = pattern_needle_sizesneedlesus,
-#            crochet_hook = pattern_needle_sizesneedlescrochet,
-#            knit_needles = pattern_needle_sizesneedlesknitting,
-#            crochet_hook_size = pattern_needle_sizesneedleshook,
-#            craft = craftcraftname,
-#            pattern_cat = pattern_categoriescategoryname,
-#            pattern_parent_cat = pattern_categoriescategoryparent.name,
-#            pattern_parent_parent_cat = pattern_categoriescategoryparent.parent.name) %>%
-#     select(-(languageslanguagesname))
-# 
-# # bind this row to main data frame
-# all_patts <- bind_rows(all_patts, clean_11_18)
+```{r, eval=FALSE}
+username <- 'read-3d3976da5ec4d757981a45b11574ad39'
+password <- 'grU3puOBHF1Si3+tLWe2gaw/bX1xzuTRqRH/+f+w'
 
+ravelry_auth(key = 'password')
+
+hot_11_25 <- search_patterns(permalink = 'sailor-slippers', page_size = 20)
+
+pattern_details_11_25 <- get_patterns(ids = hot_11_25$id)
+
+pattern_details_11_25 <- pattern_details_11_25 %>%
+  mutate(pull_date = "11/25/25")
+```
+
+## Clean 11/16/2025
+
+```{r, eval=FALSE}
+test with 11/16/2025 data set
+pattern_details_11_16 <- unnest(pattern_details_11_16, cols = pattern_needle_sizes, names_sep = "needles")
+
+pattern_details_11_16 <- unnest(pattern_details_11_16, cols = languages, names_sep = "languages")
+
+pattern_details_11_16 <- unnest(pattern_details_11_16, cols = craft, names_sep = "craft")
+
+pattern_details_11_16 <- unnest(pattern_details_11_16, cols = pattern_categories, names_sep = "category")
+
+pattern_details_11_16_clean <- pattern_details_11_16 %>%
+  select(difficulty_average, favorites_count, free, name, rating_average, yarn_weight_description, pattern_needle_sizesneedlesus, pattern_needle_sizesneedlescrochet, pattern_needle_sizesneedlesknitting, pattern_needle_sizesneedleshook, languageslanguagesname, craftcraftname, pattern_categoriescategoryname, pattern_categoriescategoryparent.name, pattern_categoriescategoryparent.parent.name, pull_date) %>%
+  group_by(name) %>%
+  mutate(n_langs = n()) %>%
+  distinct(name, .keep_all = TRUE) %>%
+  rename(knit_needle_size = pattern_needle_sizesneedlesus,
+         crochet_hook = pattern_needle_sizesneedlescrochet,
+         knit_needles = pattern_needle_sizesneedlesknitting,
+         crochet_hook_size = pattern_needle_sizesneedleshook,
+         craft = craftcraftname,
+         pattern_cat = pattern_categoriescategoryname,
+         pattern_parent_cat = pattern_categoriescategoryparent.name,
+         pattern_parent_parent_cat = pattern_categoriescategoryparent.parent.name) %>%
+  select(-(languageslanguagesname))
+```
+
+## Clean remaining data sets using function and combine
+
+```{r, eval=FALSE}
+clean_func <- function(i) {
+  i <- unnest(i, cols = pattern_needle_sizes, names_sep = "needles")
+
+  i <- unnest(i, cols = languages, names_sep = "languages")
+
+  i <- unnest(i, cols = craft, names_sep = "craft")
+
+  i <- unnest(i, cols = pattern_categories, names_sep = "category")
+
+  i <- i %>%
+    select(difficulty_average,
+           favorites_count,
+           free,
+           name,
+           rating_average,
+           yarn_weight_description,
+           pattern_needle_sizesneedlesus,
+           pattern_needle_sizesneedlescrochet,
+           pattern_needle_sizesneedlesknitting,
+           pattern_needle_sizesneedleshook,
+           languageslanguagesname,
+           craftcraftname,
+           pattern_categoriescategoryname,
+           pattern_categoriescategoryparent.name,
+           pattern_categoriescategoryparent.parent.name,
+           pull_date) %>%
+    group_by(name) %>%
+    mutate(n_langs = n()) %>%
+    distinct(name, .keep_all = TRUE) %>%
+    rename(knit_needle_size = pattern_needle_sizesneedlesus,
+           crochet_hook = pattern_needle_sizesneedlescrochet,
+           knit_needles = pattern_needle_sizesneedlesknitting,
+           crochet_hook_size = pattern_needle_sizesneedleshook,
+           craft = craftcraftname,
+           pattern_cat = pattern_categoriescategoryname,
+           pattern_parent_cat = pattern_categoriescategoryparent.name,
+           pattern_parent_parent_cat = pattern_categoriescategoryparent.parent.name) %>%
+    select(-(languageslanguagesname))
+}
+
+# create list of data sets
+patt_list <- list(pattern_details_11_17,
+                  pattern_details_11_18,
+                  pattern_details_11_19,
+                  pattern_details_11_20,
+                  pattern_details_11_21,
+                  pattern_details_11_23,
+                  pattern_details_11_24,
+                  pattern_details_11_25)
+
+# run function on all data sets
+patt_list_clean <- lapply(patt_list, clean_func)
+
+# unlist data sets and bind all rows to create full data set
+all_patts <- bind_rows(patt_list_clean)
+
+# add the 11/16 data set
+all_patts <- bind_rows(all_patts, pattern_details_11_16_clean)
+
+# extract pattern from 11/18 that was not included, clean and add to dataset
+missing_11_18 <- pattern_details_11_18 %>%
+  filter(name == "Santas look socks")
+
+missing_11_18 <- unnest(missing_11_18, cols = languages, names_sep = "languages")
+
+missing_11_18 <- unnest(missing_11_18, cols = craft, names_sep = "craft")
+
+missing_11_18 <- unnest(missing_11_18, cols = pattern_categories, names_sep = "category")
+
+clean_11_18 <- missing_11_18 %>%
+    select(difficulty_average,
+           favorites_count,
+           free,
+           name,
+           rating_average,
+           yarn_weight_description,
+           languageslanguagesname,
+           craftcraftname,
+           pattern_categoriescategoryname,
+           pattern_categoriescategoryparent.name,
+           pattern_categoriescategoryparent.parent.name,
+           pull_date) %>%
+  mutate(pattern_needle_sizesneedlesus = NA,
+         pattern_needle_sizesneedlescrochet = NA,
+         pattern_needle_sizesneedlesknitting = NA,
+         pattern_needle_sizesneedleshook = NA) %>%
+  group_by(name) %>%
+    mutate(n_langs = n()) %>%
+    distinct(name, .keep_all = TRUE) %>%
+    rename(knit_needle_size = pattern_needle_sizesneedlesus,
+           crochet_hook = pattern_needle_sizesneedlescrochet,
+           knit_needles = pattern_needle_sizesneedlesknitting,
+           crochet_hook_size = pattern_needle_sizesneedleshook,
+           craft = craftcraftname,
+           pattern_cat = pattern_categoriescategoryname,
+           pattern_parent_cat = pattern_categoriescategoryparent.name,
+           pattern_parent_parent_cat = pattern_categoriescategoryparent.parent.name) %>%
+    select(-(languageslanguagesname))
+
+# bind this row to main data frame
+all_patts <- bind_rows(all_patts, clean_11_18)
+```
+
+## Create data frame for regression analysis and data frame for Shiny app
+Note: Shiny app code is available in app.R file on Github.
+Code chunk here is set to eval=FALSE.
+
+```{r}
 library(readr)
 all_patts <- read_csv("all_patts.csv")
 
@@ -221,6 +238,9 @@ all_patts_shiny <- all_patts_clean %>%
          Free = ifelse(Free == "P", "Paid", Free))
 ```
 
+## Regression analysis
+### Number of Favorites
+
 ```{r}
 # statistical analysis of independent variables vs favorites count
 # difficulty average
@@ -266,6 +286,8 @@ cor.test(all_patts_clean$`Number of Favorites`, all_patts_clean$`Number of Langu
 lm10 <- lm(all_patts_clean$`Number of Favorites` ~ all_patts_clean$`Number of Languages`)
 summary(lm10)
 ```
+
+### Number of Top 20 Appearances
 
 ```{r}
 # statistical analysis of independent variables vs appearance count
@@ -313,7 +335,7 @@ lm10 <- lm(all_patts_clean$`Number of Top 20 Appearances` ~ all_patts_clean$`Num
 summary(lm10)
 ```
 
-```{r}
+```{r, eval=FALSE}
 theme_set(theme_bw())
 
 ui <- fluidPage(
