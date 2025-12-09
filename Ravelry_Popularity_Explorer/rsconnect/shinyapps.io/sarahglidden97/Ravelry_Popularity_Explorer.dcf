@@ -1,0 +1,12 @@
+name: Ravelry_Popularity_Explorer
+title: Ravelry_Popularity_Explorer
+username: sarahglidden97
+account: sarahglidden97
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 16278574
+bundleId: 11298734
+url: https://sarahglidden97.shinyapps.io/Ravelry_Popularity_Explorer/
+version: 1
+asMultiple: FALSE
+asStatic: FALSE
