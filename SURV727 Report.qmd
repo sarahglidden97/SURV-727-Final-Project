@@ -4,6 +4,7 @@ format: pdf
 editor: visual
 ---
 # Ravelry Popularity Exploration
+Sarah Glidden
 
 ## GitHub link: https://github.com/sarahglidden97/SURV-727-Final-Project
 
